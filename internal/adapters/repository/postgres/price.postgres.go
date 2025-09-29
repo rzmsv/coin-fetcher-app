@@ -4,21 +4,32 @@ import (
 	"time"
 
 	"github.com/username/coin-fetcher-app/internal/domain"
+	"gorm.io/gorm"
 )
 
-func (p *Postgres) Save(price *domain.Price) error {
+type PriceRepository struct {
+	DB *gorm.DB
+}
+
+func NewPriceRepository(db *gorm.DB) domain.PriceRepository {
+	return &PriceRepository{
+		DB: db,
+	}
+}
+
+func (p *PriceRepository) Save(price domain.Price) error {
 	return p.DB.Create(&price).Error
 }
-func (p *Postgres) GetLastPrice(symbol string) (*domain.Price, error) {
-	var Price *domain.Price
+func (p *PriceRepository) GetLastPrice(symbol string) (domain.Price, error) {
+	var Price domain.Price
 	err := p.DB.First(&Price).Error
 	if err != nil {
-		return &domain.Price{}, err
+		return domain.Price{}, err
 	}
 	return Price, nil
 
 }
-func (p *Postgres) GetAveragePrice(since time.Time) (float64, error) {
+func (p *PriceRepository) GetAveragePrice(since time.Time) (float64, error) {
 	var Result struct {
 		AvgPrice float64
 	}
