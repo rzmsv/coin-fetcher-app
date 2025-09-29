@@ -30,7 +30,7 @@ func (a *Handler) GetCoinPrice(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, map[string]float64{"price": result.Price})
 	}
-	result, err := a.service.GetAveragePrice(interval)
+	result, err := a.service.GetAveragePrice(interval, coin)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}

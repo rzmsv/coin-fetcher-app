@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/username/coin-fetcher-app/config"
 	"github.com/username/coin-fetcher-app/internal/adapters/external"
@@ -22,7 +23,11 @@ func main() {
 	priceService := application.NewPriceService(priceRepo, priceFetcher)
 	httpAdapter := http.NewEchoAdapter(priceService)
 	/* -------------------------------- SCHEDULER ------------------------------- */
-	scheduler.Start(priceService)
+	schedulerTimer, err := strconv.Atoi(appConfigs.Configs("SCHEDULER_MINUTE_TIME"))
+	if err != nil {
+		log.Fatal("Scheduler convert time to int error! ", err)
+	}
+	scheduler.Start(priceService, schedulerTimer, appConfigs.Configs("COIN_FOR_SCHEDULER"))
 
 	/* ------------------------------- START ECHO ------------------------------- */
 	if err := httpAdapter.Start(fmt.Sprintf(":%s", appConfigs.Configs("APP_PORT"))); err != nil {

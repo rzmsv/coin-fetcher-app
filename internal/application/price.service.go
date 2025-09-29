@@ -29,7 +29,7 @@ func (s *PriceService) GetLastPrice(coin string) (domain.Coin, error) {
 	return s.repo.GetLastPrice(coin)
 }
 
-func (s *PriceService) GetAveragePrice(interval string) (float64, error) {
+func (s *PriceService) GetAveragePrice(interval string, coin string) (float64, error) {
 	var since time.Time
 	switch interval {
 	case "1min":
@@ -41,5 +41,5 @@ func (s *PriceService) GetAveragePrice(interval string) (float64, error) {
 	default:
 		return 0, fmt.Errorf("invalid interval")
 	}
-	return s.repo.GetAveragePrice(since)
+	return s.repo.GetAveragePrice(since, coin)
 }

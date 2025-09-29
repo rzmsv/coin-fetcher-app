@@ -6,10 +6,11 @@ import (
 	"time"
 )
 
-const coin = "ethereum"
-
-func Start(service *application.PriceService) {
-	ticker := time.NewTicker(1 * time.Minute)
+func Start(service *application.PriceService, schedulerMinute int, coin string) {
+	if schedulerMinute == 0 {
+		schedulerMinute = 1
+	}
+	ticker := time.NewTicker(time.Duration(schedulerMinute) * time.Minute)
 	go func() {
 		for range ticker.C {
 			if err := service.FetchAndStorePrice(coin); err != nil {
