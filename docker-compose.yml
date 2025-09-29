@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - POSTGRES_HOST=crypto-db
+      - REDIS_HOST=crypto-redis
+    depends_on:
+      - crypto-db
+      - crypto-redis
+
+  crypto-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+
+  crypto-redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata_dev:/data
+
+volumes:
+  pgdata_dev:
+  redisdata_dev:
