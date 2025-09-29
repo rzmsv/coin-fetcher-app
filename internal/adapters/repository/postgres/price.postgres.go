@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/username/coin-fetcher-app/internal/domain"
@@ -17,23 +18,26 @@ func NewPriceRepository(db *gorm.DB) domain.PriceRepository {
 	}
 }
 
-func (p *PriceRepository) Save(price domain.Price) error {
-	return p.DB.Create(&price).Error
+func (p *PriceRepository) Save(Coin domain.Coin) error {
+	return p.DB.Create(&Coin).Error
 }
-func (p *PriceRepository) GetLastPrice(symbol string) (domain.Price, error) {
-	var Price domain.Price
-	err := p.DB.First(&Price).Error
+
+func (p *PriceRepository) GetLastPrice(coin string) (domain.Coin, error) {
+	fmt.Println(coin)
+	var Coin domain.Coin
+
+	err := p.DB.Where("coin = ?", coin).Order("timestamp DESC").First(&Coin).Error
 	if err != nil {
-		return domain.Price{}, err
+		return domain.Coin{}, err
 	}
-	return Price, nil
+	return Coin, nil
 
 }
 func (p *PriceRepository) GetAveragePrice(since time.Time) (float64, error) {
 	var Result struct {
 		AvgPrice float64
 	}
-	err := p.DB.Model(&domain.Price{}).Select("AVG(price) as avg_price").Where("timestamp = ?", since).Scan(&Result).Error
+	err := p.DB.Model(&domain.Coin{}).Select("AVG(price) as avg_price").Where("timestamp = ?", since).Scan(&Result).Error
 	if err != nil {
 		return 0, err
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/username/coin-fetcher-app/config"
@@ -8,6 +9,7 @@ import (
 	"github.com/username/coin-fetcher-app/internal/adapters/http"
 	postgres "github.com/username/coin-fetcher-app/internal/adapters/repository/postgres"
 	"github.com/username/coin-fetcher-app/internal/application"
+	"github.com/username/coin-fetcher-app/internal/scheduler"
 )
 
 func main() {
@@ -19,7 +21,11 @@ func main() {
 	priceFetcher := external.NewCoinGeckoFetcher()
 	priceService := application.NewPriceService(priceRepo, priceFetcher)
 	httpAdapter := http.NewEchoAdapter(priceService)
-	if err := httpAdapter.Start(appConfigs.Configs("APP_PORT")); err != nil {
+	/* -------------------------------- SCHEDULER ------------------------------- */
+	scheduler.Start(priceService)
+
+	/* ------------------------------- START ECHO ------------------------------- */
+	if err := httpAdapter.Start(fmt.Sprintf(":%s", appConfigs.Configs("APP_PORT"))); err != nil {
 		log.Fatal(err)
 	}
 }

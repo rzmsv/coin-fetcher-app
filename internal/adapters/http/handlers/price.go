@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/username/coin-fetcher-app/internal/application"
@@ -19,19 +20,19 @@ func NewHandler(e *echo.Echo, service *application.PriceService) *Handler {
 	}
 }
 
-func (a *Handler) GetPriceHandler(c echo.Context) error {
-	symbol := c.Param("symbol")
-	interval := c.Param("interval")
-	if interval == "1min" {
-		price, err := a.service.GetLastPrice(symbol)
+func (a *Handler) GetCoinPrice(c echo.Context) error {
+	coin := c.Param("coin")
+	interval := c.QueryParam("interval")
+	if interval == "1min" || interval == "" {
+		result, err := a.service.GetLastPrice(strings.ToLower(coin))
 		if err != nil {
 			return c.JSON(http.StatusNotFound, map[string]string{"error": "No data"})
 		}
-		return c.JSON(http.StatusOK, map[string]float64{"price": price.Price})
+		return c.JSON(http.StatusOK, map[string]float64{"price": result.Price})
 	}
-	price, err := a.service.GetAveragePrice(interval)
+	result, err := a.service.GetAveragePrice(interval)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, map[string]float64{"price": price})
+	return c.JSON(http.StatusOK, map[string]float64{"price": result})
 }

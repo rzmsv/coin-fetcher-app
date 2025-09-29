@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/username/coin-fetcher-app/internal/domain"
@@ -21,11 +22,11 @@ func (s *PriceService) FetchAndStorePrice(coin string) error {
 	if err != nil {
 		return err
 	}
-	return s.repo.Save(domain.Price{Price: price, Timestamp: time.Now()})
+	return s.repo.Save(domain.Coin{Coin: strings.ToLower(coin), Price: price, Timestamp: time.Now()})
 }
 
-func (s *PriceService) GetLastPrice(symbol string) (domain.Price, error) {
-	return s.repo.GetLastPrice(symbol)
+func (s *PriceService) GetLastPrice(coin string) (domain.Coin, error) {
+	return s.repo.GetLastPrice(coin)
 }
 
 func (s *PriceService) GetAveragePrice(interval string) (float64, error) {

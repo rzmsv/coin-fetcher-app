@@ -18,5 +18,5 @@ func NewPriceRoute(priceHandler *handler.Handler) *price_routes {
 func (r *price_routes) HandlerPriceRoutes(e *echo.Echo) {
 
 	api := e.Group("/api")
-	api.GET("/price/:symbol/:interval", r.priceHandler.GetPriceHandler)
+	api.GET("/price/history/:coin", r.priceHandler.GetCoinPrice)
 }

@@ -2,9 +2,9 @@ package domain
 
 import "time"
 
-type Price struct {
+type Coin struct {
 	ID        uint
 	Price     float64
-	Symbol    string
+	Coin      string
 	Timestamp time.Time
 }

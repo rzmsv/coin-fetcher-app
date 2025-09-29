@@ -5,8 +5,8 @@ import (
 )
 
 type PriceRepository interface {
-	Save(price Price) error
-	GetLastPrice(symbol string) (Price, error)
+	Save(price Coin) error
+	GetLastPrice(symbol string) (Coin, error)
 	GetAveragePrice(since time.Time) (float64, error)
 }
 

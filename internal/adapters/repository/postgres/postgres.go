@@ -27,6 +27,6 @@ func InitDB(dsn string) *gorm.DB {
 }
 
 func migrateDB() {
-	DB.AutoMigrate(&domain.Price{})
+	DB.AutoMigrate(&domain.Coin{})
 	log.Println("Migration done.")
 }

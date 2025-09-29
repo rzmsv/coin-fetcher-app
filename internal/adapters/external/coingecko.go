@@ -2,8 +2,10 @@ package external
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -21,6 +23,18 @@ func (f *CoinGeckoFetcher) FetchPrice(coin string) (float64, error) {
 		return 0, err
 	}
 	defer resp.Body.Close()
-	fmt.Println(resp)
-	return 0, err
+	var data map[string]struct {
+		USD float64 `json:"usd"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return 0, err
+	}
+
+	coin = strings.ToLower(coin)
+	priceData, exists := data[coin]
+	if !exists {
+		return 0, fmt.Errorf("price data for coin %s not found", coin)
+	}
+
+	return priceData.USD, err
 }
