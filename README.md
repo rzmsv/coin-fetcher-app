@@ -4,6 +4,7 @@ A Go-based service for fetching and storing cryptocurrency prices using the Coin
 
 ## Features
 - Fetch real-time cryptocurrency prices from the CoinGecko API using coins (e.g., `bitcoin`, `ethereum`).
+- You can change scheduler timer or coin name from .env
 - Store price data in a PostgreSQL database with fields for coin ID, price, and timestamp.
 - Retrieve the latest price or average price for a given coin over specified intervals (1min, 5min, 1day).
 - Use Redis to save coin's price
@@ -56,12 +57,10 @@ cd coin-fetcher-app
    ```bash
    go run ./cmd/server
    ```
-3. Run the application:
-   ```bash
-   DSN="your-dsn"
-   ```
 
 ### Build and Run with Docker
+*** USE PROXY ***
+
 1. Build the Docker image:
    ```bash
    docker-compose build --no-cache
@@ -80,6 +79,8 @@ The service exposes the following RESTful endpoints:
 - **GET /api/price/history/:coin**: Retrieve the latest price (for `1min`) or average price (for `5min`, `1day`) for a given coin (e.g., `bitcoin`, `ethereum`).
   - Example: `curl http://localhost:8080/api/price/history/bitcoin`
   - Response: `{"price": 65000.12345678}`
+
+  NOTICE: You want 2 APIs for get hestory and latest price (I know ) but I write all of this in one API for axample if you dont add interval you get latest price of coin from database (1min ago) and if you add interval=5min you get average price of 5min ******
 
 
 ## Database Schema
