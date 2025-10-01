@@ -1,32 +1,45 @@
 package application
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/username/coin-fetcher-app/internal/domain"
+	interfaces "github.com/username/coin-fetcher-app/internal/domain/interfaces"
+	model "github.com/username/coin-fetcher-app/internal/domain/model"
 )
 
 type PriceService struct {
-	repo    domain.PriceRepository
-	fetcher domain.PriceFetcher
+	repository interfaces.Repository
+	fetcher    interfaces.PriceFetcher
 }
 
-func NewPriceService(repo domain.PriceRepository, fetcher domain.PriceFetcher) *PriceService {
-	return &PriceService{repo, fetcher}
+func NewPriceService(repository interfaces.Repository, fetcher interfaces.PriceFetcher) *PriceService {
+	return &PriceService{repository, fetcher}
 }
 
-func (s *PriceService) FetchAndStorePrice(coin string) error {
+func (s *PriceService) FetchAndStorePriceToRedis(coin string) error {
 	price, err := s.fetcher.FetchPrice(coin)
 	if err != nil {
 		return err
 	}
-	return s.repo.Save(domain.Coin{Coin: strings.ToLower(coin), Price: price, Timestamp: time.Now()})
+	return s.repository.Redis.Set(coin, &model.Coin{Coin: strings.ToLower(coin), Price: price, Timestamp: time.Now()}, 60*time.Second)
+	// return s.repository.Save(&model.Coin{Coin: strings.ToLower(coin), Price: price, Timestamp: time.Now()})
 }
 
-func (s *PriceService) GetLastPrice(coin string) (domain.Coin, error) {
-	return s.repo.GetLastPrice(coin)
+func (s *PriceService) FetchAndStorePriceToDB(coin string) error {
+	var data *model.Coin
+	dataFromRedis, err := s.repository.Redis.Get(coin)
+	if err != nil {
+		return err
+	}
+	json.Unmarshal([]byte(dataFromRedis), &data)
+	return s.repository.Save(data)
+}
+
+func (s *PriceService) GetLastPrice(coin string) (*model.Coin, error) {
+	return s.repository.GetLastPrice(coin)
 }
 
 func (s *PriceService) GetAveragePrice(interval string, coin string) (float64, error) {
@@ -41,5 +54,5 @@ func (s *PriceService) GetAveragePrice(interval string, coin string) (float64, e
 	default:
 		return 0, fmt.Errorf("invalid interval")
 	}
-	return s.repo.GetAveragePrice(since, coin)
+	return s.repository.GetAveragePrice(since, coin)
 }

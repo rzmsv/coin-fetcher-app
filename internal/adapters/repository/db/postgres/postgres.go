@@ -3,7 +3,7 @@ package postgres
 import (
 	"log"
 
-	"github.com/username/coin-fetcher-app/internal/domain"
+	"github.com/username/coin-fetcher-app/internal/domain/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -27,6 +27,6 @@ func InitDB(dsn string) *gorm.DB {
 }
 
 func migrateDB() {
-	DB.AutoMigrate(&domain.Coin{})
+	DB.AutoMigrate(&model.Coin{})
 	log.Println("Migration done.")
 }
