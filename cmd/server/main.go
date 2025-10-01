@@ -8,7 +8,7 @@ import (
 	"github.com/username/coin-fetcher-app/config"
 	"github.com/username/coin-fetcher-app/internal/adapters/external"
 	"github.com/username/coin-fetcher-app/internal/adapters/http"
-	postgres "github.com/username/coin-fetcher-app/internal/adapters/repository/postgres"
+	postgres "github.com/username/coin-fetcher-app/internal/adapters/repository/db/postgres"
 	"github.com/username/coin-fetcher-app/internal/application"
 	"github.com/username/coin-fetcher-app/internal/scheduler"
 )
